@@ -9,8 +9,15 @@ class User(SQLModel, table=True):
 
 class Task(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    remote_id: Optional[str] = None
+
     title: str
     description: Optional[str] = None
+    
     completed: bool = False
+    status: str = "todo"    # 👈 REQUIRED FOR KANBAN
+    
     user_id: int = Field(foreign_key="user.id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    updated_at: datetime = datetime.utcnow()
+    dirty: bool = False

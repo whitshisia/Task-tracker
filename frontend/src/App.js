@@ -1,23 +1,29 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Dashboard from './components/Dashboard';
-import Tasks from './components/Tasks';
-import Analytics from './components/Analytics';
-import Settings from './components/Settings';
+import Dashboard from './pages/Dashboard';
+import Tasks from './pages/Tasks';
+import Analytics from './pages/Analytics';
+import Settings from './pages/Settings';
+import LandingPage from './pages/LandingPage';
+import Kanban from './pages/Kanban';
 import './App.css';
-
+import { ThemeProvider } from './context/ThemeContext';
 function App() {
   return (
+    <ThemeProvider>
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<LandingPage/>} />
+          <Route path="/app/*" element={<Dashboard />} />
+          <Route path="/kanban" element={<Kanban />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>
     </Router>
+    </ThemeProvider>
   );
 }
 
