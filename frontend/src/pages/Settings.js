@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import Layout from "../layout/Layout";
+import Layout from "./Layout";
 import { ThemeContext } from "../context/ThemeContext";
 
 const Settings = () => {

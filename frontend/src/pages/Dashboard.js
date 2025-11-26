@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../layout/Layout";
+import Layout from "./Layout";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import ProductivityCard from "../components/dashboard/ProductivityCard";
 import WeeklyStatsCard from "../components/dashboard/WeeklyStatsCard";

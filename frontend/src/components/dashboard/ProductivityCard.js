@@ -1,5 +1,5 @@
 import React from "react";
-import RadialProgress from "./Charts/RadialProgress";
+import RadialProgress from "../Charts/RadialProgress";
 
 const ProductivityCard = ({ summary }) => {
   return (

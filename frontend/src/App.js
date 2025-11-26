@@ -26,5 +26,9 @@ function App() {
     </ThemeProvider>
   );
 }
+// useEffect(() => {
+//   syncPendingTasks();
+//   window.addEventListener("online", syncPendingTasks);
+// }, []);
 
 export default App;

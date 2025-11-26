@@ -1,5 +1,5 @@
 import React from "react";
-import WeeklyBarChart from "./Charts/WeeklyBarChart";
+import WeeklyBarChart from "../Charts/WeeklyBarChart";
 
 const WeeklyStatsCard = ({ summary }) => {
   return (
