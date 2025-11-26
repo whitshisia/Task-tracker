@@ -11,9 +11,12 @@ from .auth import get_current_user, get_password_hash
 app = FastAPI(title="Task Manager API", version="1.0.0")
 
 # CORS middleware
+origins=["http://localhost:3000",
+        "http://localhost:8080",
+        "https://your-frontend-domain.vercel.app"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins= origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
