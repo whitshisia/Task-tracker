@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
 
+# --- USERS ---
 def create_user(session: Session, username: str, password: str):
     existing = session.exec(select(User).where(User.username == username)).first()
     if existing:
@@ -22,6 +23,7 @@ def login_user(session: Session, username: str, password: str):
     token = create_access_token({"sub": user.username})
     return {"access_token": token, "token_type": "bearer"}
 
+# --- TASKS ---
 def create_task(session: Session, title: str, description: str, user_id: int):
     task = Task(title=title, description=description, user_id=user_id, updated_at=datetime.utcnow())
     session.add(task)

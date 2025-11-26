@@ -15,7 +15,7 @@ export default function Hero() {
       </p>
 
       <Link
-        to="/app"
+        to="/signup"
         className="inline-flex items-center gap-2 bg-skyAccent text-white px-6 py-3 rounded-xl
                    text-lg font-semibold shadow-md hover:scale-105 transition-transform">
         Get Started

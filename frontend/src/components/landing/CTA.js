@@ -12,7 +12,7 @@ export default function CTA() {
       </p>
 
       <Link
-        to="/app"
+        to="/signup"
         className="bg-white text-skyAccent font-semibold px-8 py-3 rounded-xl
                    shadow-md hover:scale-105 transition-transform text-lg"
       >

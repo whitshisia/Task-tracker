@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException, Body
+from fastapi import FastAPI, Depends, Body
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import Session
+from sqlmodel import Session, select
 from database import init_db, get_session
 from crud import create_user, login_user, create_task, get_tasks, update_task, delete_task, sync_tasks, ai_summary
-from auth import get_current_user
+from auth import hash_password, verify_password, create_access_token, get_current_user
+from models import User
 
 app = FastAPI()
 
@@ -19,14 +20,22 @@ app.add_middleware(
 def on_startup():
     init_db()
 
+# --- AUTH ---
 @app.post("/signup")
 def signup(username: str, password: str, session: Session = Depends(get_session)):
-    return create_user(session, username, password)
+    user = create_user(session, username, password)
+    token = create_access_token({"sub": user.username})
+    return {"access_token": token, "user": user}
 
 @app.post("/login")
 def login(username: str, password: str, session: Session = Depends(get_session)):
     return login_user(session, username, password)
 
+@app.get("/me")
+def me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+# --- TASKS ---
 @app.get("/tasks")
 def list_tasks(session: Session = Depends(get_session), user=Depends(get_current_user)):
     return get_tasks(session, user.id)
