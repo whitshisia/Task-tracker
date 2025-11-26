@@ -92,3 +92,5 @@ python-multipart==0.0.6
 python-dotenv==1.0.0
 sqlite3
 datetime
+
+postgresql://taskflow_st55_user:gYzZCQw8XV0XdbikU23QSGzt6YBcm2sF@dpg-d4jgdmgbdp1s73fu5d4g-a/taskflow_st55
