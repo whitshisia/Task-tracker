@@ -1,42 +1,43 @@
-import React from "react";
+import React from 'react';
 
-const RadialProgress = ({ percentage }) => {
-  const radius = 50;
-  const circumference = 2 * Math.PI * radius;
-  const progress = (percentage / 100) * circumference;
+const RadialProgress = ({ percentage, size = 100, strokeWidth = 8 }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (percentage / 100) * circumference;
 
   return (
-    <svg width="140" height="140" className="rotate-[-90deg]">
-      <circle
-        cx="70"
-        cy="70"
-        r={radius}
-        stroke="#e5e7eb"
-        strokeWidth="12"
-        fill="none"
-      />
-      <circle
-        cx="70"
-        cy="70"
-        r={radius}
-        stroke="#0ea5e9"
-        strokeWidth="12"
-        strokeDasharray={circumference}
-        strokeDashoffset={circumference - progress}
-        fill="none"
-        strokeLinecap="round"
-      />
-      <text
-        x="50%"
-        y="50%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        className="rotate-90 fill-sky-700 font-semibold"
-        fontSize="22"
-      >
-        {percentage}%
-      </text>
-    </svg>
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          className="text-gray-200 dark:text-gray-700"
+        />
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className="text-primary-500 transition-all duration-500 ease-in-out"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-lg font-bold text-gray-900 dark:text-white">
+          {percentage}%
+        </span>
+      </div>
+    </div>
   );
 };
 

@@ -19,45 +19,45 @@ frontend/public/manifest.json
 frontend/public/robots.txt
 frontend/public/service-worker.js
 frontend/src/App.css
-frontend/src/App.js
+frontend/src/App.js 3
 frontend/src/App.test.js
-frontend/src/api/auth.js
-frontend/src/api/client.js
-frontend/src/components/AddTaskModal.js
-frontend/src/components/Charts/CompletionChart.js
-frontend/src/components/Charts/RadialProgress.js
-frontend/src/components/Charts/WeeklyBarChart.js
-frontend/src/components/ConfirmModal.js
-frontend/src/components/Navbar.js
-frontend/src/components/TaskFilters.js
-frontend/src/components/TaskList.js
-frontend/src/components/dashboard/DashboardHeader.js
-frontend/src/components/dashboard/InsightsCard.js
-frontend/src/components/dashboard/ProductivityCard.js
-frontend/src/components/dashboard/WeeklyStatsCard.js
-frontend/src/components/kanban/KanbanCard.js
-frontend/src/components/kanban/KanbanColumn.js
-frontend/src/components/landing/CTA.js
-frontend/src/components/landing/Features.js
-frontend/src/components/landing/Footer.js
-frontend/src/components/landing/Hero.js
-frontend/src/components/sidebar.js
-frontend/src/context/ThemeContext.js
-frontend/src/index.css
-frontend/src/index.js
-frontend/src/lib/api.js
+frontend/src/api/auth.js 4
+frontend/src/api/client.js 5
+frontend/src/components/AddTaskModal.js 11
+frontend/src/components/Charts/CompletionChart.js 17
+frontend/src/components/Charts/RadialProgress.js 18
+frontend/src/components/Charts/WeeklyBarChart.js 35
+frontend/src/components/ConfirmModal.js 19
+frontend/src/components/Navbar.js 7
+frontend/src/components/TaskFilters.js 29
+frontend/src/components/TaskList.js 30
+frontend/src/components/dashboard/DashboardHeader.js 31
+frontend/src/components/dashboard/InsightsCard.js 32
+frontend/src/components/dashboard/ProductivityCard.js 33
+frontend/src/components/dashboard/WeeklyStatsCard.js 34
+frontend/src/components/kanban/KanbanCard.js 14
+frontend/src/components/kanban/KanbanColumn.js 13
+frontend/src/components/landing/CTA.js 25
+frontend/src/components/landing/Features.js 26
+frontend/src/components/landing/Footer.js 27
+frontend/src/components/landing/Hero.js 28
+frontend/src/components/sidebar.js 8
+frontend/src/context/ThemeContext.js 6
+frontend/src/index.css 2
+frontend/src/index.js 24
+frontend/src/lib/api.js 23
 frontend/src/logo.svg
-frontend/src/pages/Analytics.js
-frontend/src/pages/Dashboard.js
-frontend/src/pages/Kanban.js
-frontend/src/pages/LandingPage.js
-frontend/src/pages/Layout.js
-frontend/src/pages/Settings.js
-frontend/src/pages/Tasks.js
+frontend/src/pages/Analytics.js 15
+frontend/src/pages/Dashboard.js 10
+frontend/src/pages/Kanban.js 12
+frontend/src/pages/LandingPage.js 20
+frontend/src/pages/Layout.js 9
+frontend/src/pages/Settings.js 16
+frontend/src/pages/Tasks.js 21
 frontend/src/reportWebVitals.js
 frontend/src/setupTests.js
-frontend/src/utilis/db.js
-frontend/tailwind.config.js
+frontend/src/utilis/db.js 22
+frontend/tailwind.config.js 1
 
 
 annotated-doc==0.0.4

@@ -1,178 +1,224 @@
-// src/pages/Tasks.jsx
-import React, { useEffect, useState, useMemo } from "react";
-import TaskFilters from "../components/TaskFilters";
-import TaskList from "../components/TaskList";
-import AddTaskModal from "../components/AddTaskModal";
-import ConfirmModal from "../components/ConfirmModal";
-import { api } from "../lib/api";
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Filter, List, Grid } from 'lucide-react';
+import client from '../api/client';
+import TaskList from '../components/TaskList';
+import TaskFilters from '../components/TaskFilters';
+import AddTaskModal from '../components/AddTaskModal';
 
-export default function TasksPage() {
+const Tasks = () => {
   const [tasks, setTasks] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-
-  // Filters
-  const [q, setQ] = useState("");
-  const [status, setStatus] = useState("");
-  const [priority, setPriority] = useState("");
-  const [category, setCategory] = useState("");
-
-  // Delete modal state
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [taskToDelete, setTaskToDelete] = useState(null);
+  const [filteredTasks, setFilteredTasks] = useState([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
+  const [filters, setFilters] = useState({
+    status: 'all',
+    completed: 'all',
+    sortBy: 'updated_at',
+    sortOrder: 'desc'
+  });
 
   useEffect(() => {
-    load();
+    fetchTasks();
   }, []);
 
-  async function load() {
-    try {
-      const data = await api("/tasks", "GET");
-      setTasks(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Failed to load tasks:", err);
-    }
-  }
+  useEffect(() => {
+    filterAndSortTasks();
+  }, [tasks, filters, searchTerm]);
 
-  // Save or update task
-  async function handleSave(payload) {
+  const fetchTasks = async () => {
     try {
-      if (editing) {
-        await api(`/tasks/${editing.id}`, "PATCH", payload);
-        setEditing(null);
-      } else {
-        await api("/tasks", "POST", payload);
+      const response = await client.get('/tasks');
+      setTasks(response.data);
+    } catch (error) {
+      console.error('Failed to fetch tasks:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterAndSortTasks = () => {
+    let result = [...tasks];
+
+    // Search filter
+    if (searchTerm) {
+      result = result.filter(task =>
+        task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Status filter
+    if (filters.status !== 'all') {
+      result = result.filter(task => task.status === filters.status);
+    }
+
+    // Completed filter
+    if (filters.completed !== 'all') {
+      result = result.filter(task => task.completed === (filters.completed === 'completed'));
+    }
+
+    // Sorting
+    result.sort((a, b) => {
+      let aValue = a[filters.sortBy];
+      let bValue = b[filters.sortBy];
+
+      if (filters.sortBy === 'created_at' || filters.sortBy === 'updated_at') {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
       }
 
-      setOpen(false);
-      load();
-    } catch (err) {
-      console.error(err);
-      alert("Save failed: " + err.message);
-    }
-  }
+      if (filters.sortOrder === 'asc') {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
 
-  // Toggle completed status
-  async function handleToggle(task) {
+    setFilteredTasks(result);
+  };
+
+  const handleTaskUpdate = async (taskId, updates) => {
     try {
-      await api(`/tasks/${task.id}`, "PATCH", { completed: !task.completed });
-      load();
-    } catch (err) {
-      console.error(err);
+      await client.patch(`/tasks/${taskId}`, updates);
+      setTasks(prev => prev.map(task => 
+        task.id === taskId ? { ...task, ...updates } : task
+      ));
+    } catch (error) {
+      console.error('Failed to update task:', error);
     }
-  }
+  };
 
-  // Open confirm delete modal
-  function handleDelete(task) {
-    setTaskToDelete(task);
-    setShowConfirm(true);
-  }
-
-  // Confirm delete action
-  async function confirmDelete() {
+  const handleTaskDelete = async (taskId) => {
     try {
-      await api(`/tasks/${taskToDelete.id}`, "DELETE");
-      setShowConfirm(false);
-      setTaskToDelete(null);
-      load();
-    } catch (err) {
-      console.error(err);
+      await client.delete(`/tasks/${taskId}`);
+      setTasks(prev => prev.filter(task => task.id !== taskId));
+    } catch (error) {
+      console.error('Failed to delete task:', error);
     }
-  }
+  };
 
-  // Filter tasks
-  const filtered = useMemo(() => {
-    return tasks
-      .filter(t =>
-        q ? (t.title + t.description).toLowerCase().includes(q.toLowerCase()) : true
-      )
-      .filter(t => {
-        if (!status) return true;
-        if (status === "todo") return !t.completed;
-        if (status === "done") return t.completed;
-        return true;
-      })
-      .filter(t => (priority ? t.priority === priority : true))
-      .filter(t => (category ? t.category === category : true));
-  }, [tasks, q, status, priority, category]);
+  if (loading) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-6"></div>
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Tasks</h1>
-          <p className="text-sm text-gray-500">
-            Create, filter, and manage your tasks
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">All Tasks</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Manage and organize your tasks
           </p>
         </div>
-
+        
         <button
-          onClick={() => {
-            setEditing(null);
-            setOpen(true);
-          }}
-          className="bg-sky-600 text-white px-4 py-2 rounded-lg shadow"
+          onClick={() => setIsAddModalOpen(true)}
+          className="flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors text-sm font-medium mt-4 sm:mt-0"
         >
-          + Add Task
+          <Plus className="h-4 w-4 mr-2" />
+          Add Task
         </button>
       </div>
 
-      {/* Filters */}
-      <TaskFilters
-        q={q}
-        setQ={setQ}
-        status={status}
-        setStatus={setStatus}
-        priority={priority}
-        setPriority={setPriority}
-        category={category}
-        setCategory={setCategory}
-        onClear={() => {
-          setQ("");
-          setStatus("");
-          setPriority("");
-          setCategory("");
-        }}
-      />
+      {/* Controls */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        {/* Search */}
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+          />
+        </div>
 
-      {/* Task List */}
-      <div className="mt-6">
-        <TaskList
-          tasks={filtered}
-          onToggle={handleToggle}
-          onEdit={(t) => {
-            setEditing(t);
-            setOpen(true);
-          }}
-          onDelete={handleDelete} // fixed here
-        />
+        <div className="flex items-center space-x-4">
+          {/* View Toggle */}
+          <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-white dark:bg-gray-600 shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400'
+              }`}
+            >
+              <List className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-gray-600 shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400'
+              }`}
+            >
+              <Grid className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Filter Button */}
+          <TaskFilters filters={filters} onFiltersChange={setFilters} />
+        </div>
       </div>
 
-      {/* Add / Edit Modal */}
-      <AddTaskModal
-        open={open}
-        onClose={() => {
-          setOpen(false);
-          setEditing(null);
-        }}
-        onSave={handleSave}
-        initial={editing}
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+            {tasks.length}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">To Do</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+            {tasks.filter(t => t.status === 'todo').length}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">In Progress</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+            {tasks.filter(t => t.status === 'in-progress').length}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Completed</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+            {tasks.filter(t => t.status === 'done').length}
+          </p>
+        </div>
+      </div>
+
+      {/* Task List */}
+      <TaskList
+        tasks={filteredTasks}
+        viewMode={viewMode}
+        onTaskUpdate={handleTaskUpdate}
+        onTaskDelete={handleTaskDelete}
       />
 
-      {/* Delete Confirmation Modal */}
-      <ConfirmModal
-        open={showConfirm}
-        title="Delete Task?"
-        description={
-          taskToDelete ? `Are you sure you want to delete "${taskToDelete.title}"?` : ""
-        }
-        onCancel={() => {
-          setShowConfirm(false);
-          setTaskToDelete(null);
-        }}
-        onConfirm={confirmDelete}
+      <AddTaskModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onTaskAdded={fetchTasks}
       />
     </div>
   );
-}
+};
+
+export default Tasks;
